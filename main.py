@@ -54,15 +54,15 @@ while run:
         spiller._xakse += spiller._speed
 
     
-    if spiller._xakse == fiende._xakse or spiller._yakse == fiende._yakse:
+    player_rect = pygame.Rect(spiller._xakse, spiller._yakse, spiller._size, spiller._size)
+    enemy_rect = pygame.Rect(fiende._xakse, fiende._yakse, fiende._size, fiende._size)
+    if player_rect.colliderect(enemy_rect):
         run = False
 
     screen.fill((255,255,255))
-    pygame.draw.rect(screen,(0,255,0),(spiller._xakse,spiller._yakse,spiller._size, spiller._size))
-    pygame.draw.rect(screen,(0,255,255),(fiende._xakse,fiende._yakse,fiende._size, fiende._size))
+    pygame.draw.rect(screen,(0,255,255),player_rect)
+    pygame.draw.rect(screen,(255,0,0),enemy_rect)
 
-    
-    
 
     pygame.display.flip()       #Oppaterer display
 
