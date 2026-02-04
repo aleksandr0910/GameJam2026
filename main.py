@@ -54,7 +54,8 @@ while run:
         spiller._xakse += spiller._speed
 
     
-    
+    if spiller._xakse == fiende._xakse or spiller._yakse == fiende._yakse:
+        run = False
 
     screen.fill((255,255,255))
     pygame.draw.rect(screen,(0,255,0),(spiller._xakse,spiller._yakse,spiller._size, spiller._size))
