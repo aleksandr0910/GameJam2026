@@ -16,6 +16,8 @@ FPS = 60
 #Spiller
 class Spiller:
     def __init__(self):
+        self._health = 100
+        self._healthbar = pygame.Rect(600,100,self._health,40)
         self._xakse= 100
         self._yakse= 100
         self._speed = 5
@@ -25,12 +27,14 @@ spiller = Spiller()
 
 class Fiende:
     def __init__(self,size):
-        self._health = 100
+        self._health = 200
         self._dmg = 5
         self._size = size
         self._xakse = 500
         self._yakse = 500
 fiende = Fiende(100)
+
+bakgrunnsbilde = pygame.image.load("bilder/bacground.jpg")
 
 run = True
 while run:
@@ -56,14 +60,25 @@ while run:
     
     player_rect = pygame.Rect(spiller._xakse, spiller._yakse, spiller._size, spiller._size)
     enemy_rect = pygame.Rect(fiende._xakse, fiende._yakse, fiende._size, fiende._size)
-    if player_rect.colliderect(enemy_rect):
-        run = False
 
     screen.fill((255,255,255))
+    
+    health_farge = (0,255,0)
+    
+    
+    #Lager en colliderect som senker healthbar til objekt
+    if player_rect.colliderect(enemy_rect):
+        health_farge = (255,255,0)
+        spiller._health -= 1
+        spiller._healthbar = pygame.Rect(600,100,spiller._health,40)
+        if spiller._health == 0:
+            run = False
+
+
+    screen.blit(bakgrunnsbilde, (0, 0))
+    pygame.draw.rect(screen,(health_farge),spiller._healthbar)
     pygame.draw.rect(screen,(0,255,255),player_rect)
     pygame.draw.rect(screen,(255,0,0),enemy_rect)
-
-
     pygame.display.flip()       #Oppaterer display
 
 
