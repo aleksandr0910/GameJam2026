@@ -11,12 +11,18 @@ pygame.display.set_caption("Her er caption")
 karakter_bilde = pygame.image.load("bilder/Soldat.png")
 
 clock = pygame.time.Clock()
-FPS = 100
+FPS = 60
 
 font = pygame.font.Font(None, 24)
 
 CENTER_x = WIDTH // 2
 CENTER_y = HEIGHT // 2
+
+# Spawn and performance tuning
+MAX_ENEMIES = 120
+SPAWN_CHANCE = 0.02
+SPAWN_RADIUS_X = 1500
+SPAWN_RADIUS_Y = 800
 
 
 class Soldat:
@@ -78,11 +84,9 @@ class Tank(Soldat):
 class Fiende:
     def __init__(self, size, health=None):
         self._status = "Fiende"
-        # If no health provided, pick a random value between 10 and 100
         if health is None:
             health = random.randint(10, 100)
         self._health = health
-        # keep a fixed max so the bar shows proportion of 0..100
         self._maxhealth = 100
         self._dmg = 5
         self._size = size
@@ -145,13 +149,17 @@ while run:
     player_rect = pygame.Rect(player_pos[0], player_pos[1], spiller._size, spiller._size)
    
 
+    # cull to enemies near the camera to avoid processing far-away enemies
+    world_view = pygame.Rect(camera_x - 100, camera_y - 100, WIDTH + 200, HEIGHT + 200)
     for f in fiender[:]:
+        # skip processing/drawing for enemies outside the view rect
+        if not world_view.collidepoint(f._xakse, f._yakse):
+            continue
+
         enemy_rect = pygame.Rect(f._xakse - camera_x, f._yakse - camera_y, f._size, f._size)
         tank_rect = pygame.Rect(f._xakse - camera_x, f._yakse - camera_y, f._size, f._size)
-        enemy_healthbar = None
 
         if player_rect.colliderect(enemy_rect) or player_rect.colliderect(tank_rect):
-            # combat only applies when cooldown timer reached
             if spiller._combat_timer <= 0:
                 if f._health < spiller._health:
                     spiller._health += f._health
@@ -167,7 +175,7 @@ while run:
                     spiller._xakse -= 50
                     spiller._yakse -= 50
                 spiller._combat_timer = spiller._combat_cooldown
-        
+
         if f in fiender:
             pygame.draw.rect(screen,(255,0,0),enemy_rect)
             hb_width = max(24, f._size)
@@ -184,15 +192,16 @@ while run:
             if isinstance(f, FiendeTank):
                 pygame.draw.rect(screen, f._farger, tank_rect)
    
-    if random.random() < 0.9:
-        ny_fiende = Fiende(100, random.randint(10,100))
-        ny_fiende._xakse = random.randint(-20000, 20000)
-        ny_fiende._yakse = random.randint(-15000, 15000)
+    # spawn enemies near the player with a cap to avoid performance issues
+    if len(fiender) < MAX_ENEMIES and random.random() < SPAWN_CHANCE:
+        ny_fiende = Fiende(100)
+        ny_fiende._xakse = spiller._xakse + random.randint(-SPAWN_RADIUS_X, SPAWN_RADIUS_X)
+        ny_fiende._yakse = spiller._yakse + random.randint(-SPAWN_RADIUS_Y, SPAWN_RADIUS_Y)
         fiender.append(ny_fiende)
-        if random.random() < 0.01:
+        if random.random() < 0.01 and len(fiender) < MAX_ENEMIES:
             ny_Tank = FiendeTank(250)
-            ny_Tank._xakse = random.randint(-20000,20000)
-            ny_Tank._yakse = random.randint(-15000,15000)
+            ny_Tank._xakse = spiller._xakse + random.randint(-SPAWN_RADIUS_X, SPAWN_RADIUS_X)
+            ny_Tank._yakse = spiller._yakse + random.randint(-SPAWN_RADIUS_Y, SPAWN_RADIUS_Y)
             fiender.append(ny_Tank)
     
    
