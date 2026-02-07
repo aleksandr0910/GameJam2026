@@ -5,8 +5,6 @@ from main import fiende
 
 pygame.init()
 
-def combat(objekt,fiende):
-    krig = objekt.colliderect(fiende)
     
 
 pygame.quit()

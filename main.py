@@ -21,8 +21,8 @@ CENTER_y = HEIGHT // 2
 # Spawn and performance tuning
 MAX_ENEMIES = 120
 SPAWN_CHANCE = 0.02
-SPAWN_RADIUS_X = 1500
-SPAWN_RADIUS_Y = 800
+SPAWN_RADIUS_X = 10000
+SPAWN_RADIUS_Y = 8000
 
 
 class Soldat:
@@ -37,7 +37,7 @@ class Soldat:
         self._speed = 5
         self._size = 50
         self._combat_timer = 0
-        self._combat_cooldown = 30
+        self._combat_cooldown = 10
         try:
             self._sprite = pygame.transform.scale(karakter_bilde, (self._size, self._size))
         except Exception:
@@ -105,6 +105,14 @@ bakgrunnsbilde = pygame.image.load("bilder/bacground.jpg")
 
 fiender = [fiende]
 
+def spawn_potion():
+    potion = pygame.Rect(spiller._xakse + random.randint(-5000, 5000),
+                         spiller._yakse + random.randint(-8000, 8000),20, 20
+    )
+    return potion
+
+potion_of_health = spawn_potion()
+
 run = True
 while run:
     clock.tick(FPS)
@@ -148,11 +156,18 @@ while run:
     player_pos = (CENTER_x - spiller._size // 2, CENTER_y - spiller._size // 2)
     player_rect = pygame.Rect(player_pos[0], player_pos[1], spiller._size, spiller._size)
    
+    potion_rect = pygame.Rect(
+        potion_of_health.x - camera_x, 
+        potion_of_health.y - camera_y, 
+        potion_of_health.width, 
+        potion_of_health.height
+    )
 
-    # cull to enemies near the camera to avoid processing far-away enemies
+
+    
     world_view = pygame.Rect(camera_x - 100, camera_y - 100, WIDTH + 200, HEIGHT + 200)
     for f in fiender[:]:
-        # skip processing/drawing for enemies outside the view rect
+       
         if not world_view.collidepoint(f._xakse, f._yakse):
             continue
 
@@ -192,13 +207,13 @@ while run:
             if isinstance(f, FiendeTank):
                 pygame.draw.rect(screen, f._farger, tank_rect)
    
-    # spawn enemies near the player with a cap to avoid performance issues
+
     if len(fiender) < MAX_ENEMIES and random.random() < SPAWN_CHANCE:
         ny_fiende = Fiende(100)
         ny_fiende._xakse = spiller._xakse + random.randint(-SPAWN_RADIUS_X, SPAWN_RADIUS_X)
         ny_fiende._yakse = spiller._yakse + random.randint(-SPAWN_RADIUS_Y, SPAWN_RADIUS_Y)
         fiender.append(ny_fiende)
-        if random.random() < 0.01 and len(fiender) < MAX_ENEMIES:
+        if random.random() < 0.1 and len(fiender) < MAX_ENEMIES:
             ny_Tank = FiendeTank(250)
             ny_Tank._xakse = spiller._xakse + random.randint(-SPAWN_RADIUS_X, SPAWN_RADIUS_X)
             ny_Tank._yakse = spiller._yakse + random.randint(-SPAWN_RADIUS_Y, SPAWN_RADIUS_Y)
@@ -207,6 +222,11 @@ while run:
    
 
     pygame.draw.rect(screen,(health_farge),spiller._healthbar)
+    pygame.draw.rect(screen, (0, 255, 100), potion_rect)  
+    
+    if player_rect.colliderect(potion_rect):
+        spiller.økHelse(20)
+        potion_of_health = spawn_potion()
     
     health_text = font.render(f"Health: {spiller._health}", True, (0, 0, 0))
     screen.blit(health_text, (spiller._healthbar.x, spiller._healthbar.y - 25))
