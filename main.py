@@ -18,9 +18,8 @@ font = pygame.font.Font(None, 24)
 CENTER_x = WIDTH // 2
 CENTER_y = HEIGHT // 2
 
-# Spawn and performance tuning
 MAX_ENEMIES = 120
-SPAWN_CHANCE = 0.02
+SPAWN_CHANCE = 0.09
 SPAWN_RADIUS_X = 10000
 SPAWN_RADIUS_Y = 8000
 
