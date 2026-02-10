@@ -16,7 +16,7 @@ SLIK KJØRER DU SPILLET:
 ------------------------------------------------------------
 For å starte spillet, kjør følgende kommando i terminalen:
 
-python main.py
+python grow_your_might_little_knight.py
 
 (Pass på at du står i mappen der main.py og mappene 'bilder', 
 'lyder' og 'ui.py' ligger.)
